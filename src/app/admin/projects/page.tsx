@@ -5,6 +5,7 @@ import ProjectCard from "@/components/cards/ProjectCard";
 import FailedToFetch from "@/components/failed-to-fetch";
 import Loading from "@/components/loading";
 import GlobalEditDialog from "@/components/Porjects/GlobalEditDialog";
+import Create from "@/components/Porjects/Create";
 
 async function page() {
   let projects: ProjectFace[] = [];
@@ -38,13 +39,7 @@ async function page() {
       <GlobalEditDialog />
       <GlobalDeleteDialog />
       <div className={"w-full h-full text-white space-y-4"}>
-        <div
-          className={
-            "p-10 py-24 text-2xl bg-navy-800 border-2 border-navy-700 rounded-xl w-full text-center"
-          }
-        >
-          Create New Data +
-        </div>
+        <Create />
         <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
           <Suspense fallback={<Loading />}>
             {projects.map((item) => (

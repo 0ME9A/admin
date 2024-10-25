@@ -5,10 +5,21 @@ import PrimaryBtn from "../buttons/PrimaryBtn";
 import { ProjectFace } from "@/ts/components";
 import ImageUpload from "./ImageUpload";
 
+const emptyData: ProjectFace = {
+  _id: "",
+  projectType: "",
+  title: "",
+  desc: "",
+  status: "",
+  date: "",
+  address: "",
+  previewImages: [],
+};
+
 const GlobalEditDialog = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [project, setProject] = useState<ProjectFace | null>(null);
+  const [project, setProject] = useState<ProjectFace>(emptyData);
 
   // Get the project ID and action type from URL parameters
   const projectId = searchParams.get("id");
@@ -18,6 +29,9 @@ const GlobalEditDialog = () => {
   useEffect(() => {
     if (action === "edit" && projectId) {
       fetchProjectData(projectId).then(setProject);
+    } else if (action === "create") {
+      // For create, initialize an empty project object
+      setProject(emptyData);
     }
   }, [projectId, action]);
 
