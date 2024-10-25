@@ -3,9 +3,9 @@ import React from "react";
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="border h-dvh flex">
+    <div className="h-dvh flex bg-navy-900 container mx-auto">
       <Sidebar />
-      {children}
+      <div className={"p-2 w-full"}>{children}</div>
     </div>
   );
 }

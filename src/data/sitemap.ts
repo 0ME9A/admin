@@ -32,11 +32,6 @@ export const siteMap: sitemapFace[] = [
     url: "/contact",
   },
   {
-    id: "teams",
-    name: "teams",
-    url: "/teams",
-  },
-  {
     id: "careers",
     name: "careers",
     url: "/careers",
@@ -48,12 +43,12 @@ export const siteMap: sitemapFace[] = [
   },
   {
     id: "privacy_policy",
-    name: "privacy_policy",
+    name: "privacy policy",
     url: "/privacy_policy",
   },
   {
     id: "terms_of_service",
-    name: "terms_of_service",
+    name: "terms of service",
     url: "/terms_of_service",
   },
 ];
