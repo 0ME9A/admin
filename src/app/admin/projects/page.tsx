@@ -6,6 +6,7 @@ import FailedToFetch from "@/components/failed-to-fetch";
 import Loading from "@/components/loading";
 import GlobalEditDialog from "@/components/Porjects/GlobalEditDialog";
 import Create from "@/components/Porjects/Create";
+// import GlobalCreateDialog from "@/components/Porjects/GlobalCreateDialog";
 
 async function page() {
   let projects: ProjectFace[] = [];
@@ -36,6 +37,7 @@ async function page() {
 
   return (
     <>
+      {/* <GlobalCreateDialog /> */}
       <GlobalEditDialog />
       <GlobalDeleteDialog />
       <div className={"w-full h-full text-white space-y-4"}>

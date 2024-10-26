@@ -1,16 +1,16 @@
-"use client"; // Needed for client-side components
+"use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ProjectFace } from "@/ts/components";
 import Image from "next/image";
 import PrimaryBtn from "../buttons/PrimaryBtn";
 
-interface cardFace {
+interface CardFace {
   data: ProjectFace;
   className?: string;
 }
 
-function ProjectCard({ data, className }: cardFace) {
+function ProjectCard({ data, className }: CardFace) {
   const { title, previewImages, desc, date, address, status } = data;
   const setDate = new Date(date);
 
@@ -19,28 +19,32 @@ function ProjectCard({ data, className }: cardFace) {
   const router = useRouter();
 
   const handleAction = (action: string) => {
-    // Construct the new search parameters
     const newParams = new URLSearchParams(searchParams.toString());
-    newParams.set("id", data._id); // Add or update project id
-    newParams.set("title", data.title); // Add or update action title
-    newParams.set("action", action); // Add or update action type
-
-    // Update the URL with the new query parameters
+    newParams.set("id", data._id);
+    newParams.set("title", data.title);
+    newParams.set("action", action);
     router.push(`${pathname}?${newParams.toString()}`);
   };
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
-      <Image
-        src={previewImages[0] || ""}
-        alt={title}
-        width={500}
-        height={500}
-        quality={100}
-        blurDataURL="data:..."
-        placeholder="blur"
-        className="w-full h-full object-cover aspect-square clip-path-penta-tl-sm md:clip-path-penta-tl-md"
-      />
+      {previewImages[0] ? (
+        <Image
+          src={`data:image/jpeg;base64,${previewImages[0]}`}
+          alt={title}
+          width={500}
+          height={500}
+          quality={100}
+          blurDataURL="data:..."
+          placeholder="blur"
+          className="w-full h-full object-cover aspect-square clip-path-penta-tl-sm md:clip-path-penta-tl-md"
+        />
+      ) : (
+        <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+          <span className="text-gray-500">No Image Available</span>
+        </div>
+      )}
+
       <span className="w-full h-full absolute top-0 bg-gradient-to-t from-navy-900/80 to-transparent" />
       <div className="h-16"></div>
       <div className="absolute top-2 right-2 p-2 py-1 bg-navy-900/20 flex justify-center items-center gap-2 text-xs rounded-full text-white">

@@ -22,7 +22,7 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ project }, { status: 200 });
+    return NextResponse.json(project, { status: 200 }); // Return project directly
   } catch (error) {
     console.error("Error fetching project:", error);
     return NextResponse.json(
@@ -61,44 +61,61 @@ export async function DELETE(
   }
 }
 
+// app/api/admin/projects/[id]/route.ts
 export async function PUT(
   req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    await connectMongo(); // Connect to the database
+    // Connect to MongoDB
+    await connectMongo();
 
+    // Get the project ID from the URL parameters
     const { id } = params;
-    const formData = await req.formData();
 
-    const title = formData.get("title") as string;
-    const description = formData.get("desc") as string;
-    const status = formData.get("status") as string;
-    const date = formData.get("date") as string;
-    const address = formData.get("address") as string;
+    // Parse the JSON body from the request
+    const { title, address, desc, date, projectType, status, previewImages } =
+      await req.json();
 
+    // Validate that all required fields are provided
+    if (!title || !address || !desc || !date || !projectType || !status) {
+      return NextResponse.json(
+        { error: "All required fields must be provided" },
+        { status: 400 }
+      );
+    }
+
+    // Prepare the updated data
     const updatedData = {
       title,
-      description,
-      status,
-      date,
       address,
+      desc,
+      date,
+      projectType,
+      status,
+      previewImages, // Array of images (Base64 strings)
     };
 
+    // Update the project in MongoDB and return the updated document
     const updatedProject = await Project.findByIdAndUpdate(id, updatedData, {
-      new: true,
+      new: true, // Return the updated document
     });
 
+    // If the project is not found, return a 404 response
     if (!updatedProject) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    return NextResponse.json({
-      message: "Project updated successfully",
-      project: updatedProject,
-    });
+    // Return the updated project in the response
+    return NextResponse.json(
+      {
+        message: "Project updated successfully",
+        project: updatedProject,
+      },
+      { status: 200 }
+    );
   } catch (error) {
-    console.error(error);
+    console.error("Error updating project:", error);
     return NextResponse.json(
       { error: "Failed to update project" },
       { status: 500 }

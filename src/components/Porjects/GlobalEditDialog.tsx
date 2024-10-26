@@ -1,178 +1,290 @@
 "use client";
-import { useSearchParams, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import PrimaryBtn from "../buttons/PrimaryBtn";
-import { ProjectFace } from "@/ts/components";
-import ImageUpload from "./ImageUpload";
 
-const emptyData: ProjectFace = {
-  _id: "",
-  projectType: "",
+import { useRouter, useSearchParams } from "next/navigation";
+import { ProjectFace } from "@/ts/components";
+import { useEffect, useState } from "react";
+import { IoMdClose } from "react-icons/io";
+import imageCompression from "browser-image-compression";
+import PrimaryBtn from "../buttons/PrimaryBtn";
+import Image from "next/image";
+
+const emptyData = {
   title: "",
-  desc: "",
-  status: "",
-  date: "",
   address: "",
+  desc: "",
+  date: new Date().toISOString(),
+  projectType: "",
+  status: "",
   previewImages: [],
 };
 
 const GlobalEditDialog = () => {
+  const [project, setProject] = useState<Omit<ProjectFace, "_id">>(emptyData);
+  const [loading, setLoading] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [project, setProject] = useState<ProjectFace>(emptyData);
 
-  // Get the project ID and action type from URL parameters
   const projectId = searchParams.get("id");
   const action = searchParams.get("action");
 
-  // Fetch the project data from the backend
-  useEffect(() => {
-    if (action === "edit" && projectId) {
-      fetchProjectData(projectId).then(setProject);
-    } else if (action === "create") {
-      // For create, initialize an empty project object
-      setProject(emptyData);
-    }
-  }, [projectId, action]);
+  // Compress and convert the image to Base64
+  const handleImageUpload = async (file: File) => {
+    try {
+      const options = {
+        maxSizeMB: 0.5, // Max size 500KB
+        maxWidthOrHeight: 1024,
+        useWebWorker: true,
+      };
 
-  // Fetch project details by ID
-  const fetchProjectData = async (id: string) => {
-    const response = await fetch(`/api/admin/projects/${id}`);
-    const data = await response.json();
-    return data.project;
+      // Compress image
+      const compressedFile = await imageCompression(file, options);
+
+      // Convert to Base64
+      const reader = new FileReader();
+      return new Promise<string>((resolve, reject) => {
+        reader.onloadend = () => {
+          const base64String = reader.result?.toString().split(",")[1];
+          resolve(base64String || "");
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(compressedFile);
+      });
+    } catch (error) {
+      console.error("Image compression error:", error);
+      return "";
+    }
   };
 
-  // Handle form submission to update the project
-  const handleUpdate = async (event: React.FormEvent) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.files) {
+      const file = event.target.files[0];
+      const base64Image = await handleImageUpload(file);
+      if (base64Image) {
+        setProject((prev) => ({
+          ...prev,
+          previewImages: [...prev.previewImages, base64Image],
+        }));
+      }
+    }
+  };
+
+  // Function to remove an image from previewImages
+  const removeImage = (indexToRemove: number) => {
+    setProject((prevProject) => ({
+      ...prevProject,
+      previewImages: prevProject.previewImages.filter(
+        (_, index) => index !== indexToRemove
+      ),
+    }));
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setLoading(true);
 
-    const formData = new FormData();
-    formData.append("title", project?.title || "");
-    formData.append("description", project?.desc || "");
-    formData.append("status", project?.status || "");
-    formData.append("date", project?.date || "");
-    formData.append("address", project?.address || "");
+    if (project) {
+      try {
+        const response = await fetch(`/api/admin/projects/${projectId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(project),
+        });
 
-    if (projectId) {
-      await updateProjectData(projectId, formData);
-      handleCancel(); // Close the dialog after updating
+        if (response.ok) {
+          alert("Project updated successfully!");
+          router.push("/admin/projects"); // Redirect to the projects page or desired route
+        } else {
+          alert("Failed to update project");
+        }
+      } catch (error) {
+        console.error("Update Error:", error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
-  // Update the project in the backend
-  const updateProjectData = async (id: string, formData: FormData) => {
-    const response = await fetch(`/api/admin/projects/${id}`, {
-      method: "PUT",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to update project");
+  // Fetch project data from the server
+  const fetchProject = async (id: string) => {
+    try {
+      const response = await fetch(`/api/admin/projects/${id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setProject(data);
+      } else {
+        console.error("Failed to fetch project");
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
     }
   };
 
-  // Handle cancel action to close the dialog
-  const handleCancel = () => {
-    router.push("/admin/projects");
-  };
+  useEffect(() => {
+    if (projectId && action === "edit") {
+      fetchProject(projectId);
+    }
+  }, [action, projectId]);
 
-  if (!project || action !== "edit") return null;
+  if (!projectId || action !== "edit") return null;
 
   return (
-    <div className="fixed overflow-auto inset-0 flex items-center pt-52 justify-center z-50 bg-black/50 text-black">
-      <div className="bg-white p-6 rounded-lg w-3/4 max-w-lg">
-        <h2 className="text-2xl mb-4">Edit Project</h2>
-        <form onSubmit={handleUpdate}>
+    <section className="fixed top-0 left-0 w-full bg-black/50 z-50 overflow-auto py-10 h-dvh backdrop-blur-sm">
+      <div className="p-6 text-black max-w-xl w-full mx-auto bg-navy-800 rounded-lg">
+        <h2 className="text-2xl mb-4 text-white">Upload Project</h2>
+        <form onSubmit={handleSubmit} className="text-white">
           <div className="mb-4">
-            <label className="block mb-2" htmlFor="title">
+            <label htmlFor="title" className="block mb-2">
               Title
             </label>
             <input
               type="text"
+              id="title"
               value={project.title}
               onChange={(e) =>
                 setProject({ ...project, title: e.target.value })
               }
-              className="w-full p-2 border"
-              id="title"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2" htmlFor="desc">
-              Description
-            </label>
-            <textarea
-              value={project.desc}
-              onChange={(e) => setProject({ ...project, desc: e.target.value })}
-              className="w-full p-2 border"
-              id="desc"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2" htmlFor="address">
-              Address
-            </label>
-            <input
-              type="text"
-              value={project.address}
-              onChange={(e) =>
-                setProject({ ...project, address: e.target.value })
-              }
-              className="w-full p-2 border"
-              id="address"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2" htmlFor="status">
-              Status
-            </label>
-            <input
-              type="text"
-              value={project.status}
-              onChange={(e) =>
-                setProject({ ...project, status: e.target.value })
-              }
-              className="w-full p-2 border"
-              id="status"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2" htmlFor="date">
-              Date
-            </label>
-            <input
-              type="date"
-              value={new Date(project.date).toISOString().split("T")[0]}
-              onChange={(e) => setProject({ ...project, date: e.target.value })}
-              className="w-full p-2 border"
-              id="date"
+              className="w-full p-2 border text-black"
               required
             />
           </div>
 
-          <ImageUpload
-            img_id={project.previewImages[0]}
-            src={project.previewImages[0]}
-            // setImgUploadStatus={setImgUploadStatus}
-          />
+          <div className="mb-4">
+            <label htmlFor="desc" className="block mb-2">
+              Description
+            </label>
+            <textarea
+              id="desc"
+              value={project.desc}
+              onChange={(e) => setProject({ ...project, desc: e.target.value })}
+              className="w-full p-2 border text-black"
+              required
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="address" className="block mb-2">
+              Address
+            </label>
+            <input
+              type="text"
+              id="address"
+              value={project.address}
+              onChange={(e) =>
+                setProject({ ...project, address: e.target.value })
+              }
+              className="w-full p-2 border text-black"
+              required
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="status" className="block mb-2">
+              Status
+            </label>
+            <select
+              id="status"
+              value={project.status}
+              onChange={(e) =>
+                setProject({ ...project, status: e.target.value })
+              }
+              className="w-full p-2 border text-black"
+              required
+            >
+              <option value="" disabled>
+                Select Status
+              </option>
+              <option value="completed">Completed</option>
+              <option value="ongoing">Ongoing</option>
+            </select>
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="date" className="block mb-2">
+              Date
+            </label>
+            <input
+              type="date"
+              id="date"
+              value={new Date(project.date).toISOString().split("T")[0]}
+              onChange={(e) => setProject({ ...project, date: e.target.value })}
+              className="w-full p-2 border text-black"
+              required
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="projectType" className="block mb-2">
+              Project Type
+            </label>
+            <input
+              type="text"
+              id="projectType"
+              value={project.projectType}
+              onChange={(e) =>
+                setProject({ ...project, projectType: e.target.value })
+              }
+              className="w-full p-2 border text-black"
+              required
+            />
+          </div>
+
+          <div className="mb-4">
+            <div>
+              <label className="mb-2 flex justify-between gap-4">
+                Upload Preview Images{" "}
+                <strong className="">({project.previewImages.length})</strong>
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="w-full p-2"
+              />
+            </div>
+            <div className="mt-2 grid grid-cols-3 gap-4">
+              {project.previewImages.length > 0 &&
+                project.previewImages.map((img, index) => (
+                  <div className="w-full aspect-video relative" key={index}>
+                    <Image
+                      width={500}
+                      height={500}
+                      src={`data:image/jpeg;base64,${img}`}
+                      alt={`Preview ${index + 1}`}
+                      className="object-cover rounded w-full"
+                    />
+
+                    <button
+                      type="button"
+                      className="absolute top-2 right-2 p-1 rounded-full bg-red-500 hover:bg-red-600"
+                      id="remove-image"
+                      onClick={() => removeImage(index)} // Remove image on button click
+                    >
+                      <IoMdClose />
+                    </button>
+                  </div>
+                ))}
+            </div>
+          </div>
 
           <div className="flex justify-end gap-2 mt-5">
             <PrimaryBtn
               type="button"
               className="bg-gray-500 hover:bg-gray-600"
-              onClick={handleCancel}
+              onClick={() => router.push("/admin/projects")}
             >
-              Cancel
+              Close
             </PrimaryBtn>
-            <PrimaryBtn type="submit">Update</PrimaryBtn>
+            <PrimaryBtn type="submit" disabled={loading} className="disabled:bg-accent-400">
+              {loading ? "Uploading..." : "Upload Project"}
+            </PrimaryBtn>
           </div>
         </form>
       </div>
-    </div>
+    </section>
   );
 };
 

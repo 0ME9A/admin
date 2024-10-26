@@ -1,18 +1,36 @@
 "use client";
-import { useRouter } from "next/navigation";
-import React from "react";
+
+import React, { useState } from "react";
+import CreateNewProject from "./CreateNewProject";
 
 function Create() {
-  const router = useRouter();
+  const [projectForm, setProjectForm] = useState(false);
 
   return (
     <div
       className={
-        "text-2xl bg-navy-800 border-2 border-navy-700 rounded-xl w-full text-center relative"
+        "bg-navy-800 border-2 border-navy-700 rounded-xl w-full relative"
       }
     >
-      <label htmlFor="newData" className="w-full h-full block p-10 py-24 rounded-xl cursor-pointer">Create New Data +</label>
-      <button id="newData" className="hidden" onClick={()=> router.push("?action=create")}>Create New Data +</button>
+      {projectForm ? (
+        <CreateNewProject setProjectForm={setProjectForm} />
+      ) : (
+        <>
+          <label
+            htmlFor="newData"
+            className="w-full h-full block p-10 py-24 rounded-xl cursor-pointer"
+          >
+            Create New Data +
+          </label>
+          <button
+            id="newData"
+            className="hidden"
+            onClick={() => setProjectForm(!projectForm)}
+          >
+            {projectForm ? "Close" : "Create New Data +"}
+          </button>
+        </>
+      )}
     </div>
   );
 }
