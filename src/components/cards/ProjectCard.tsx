@@ -27,7 +27,7 @@ function ProjectCard({ data, className }: CardFace) {
   };
 
   return (
-    <div className={`relative overflow-hidden ${className}`}>
+    <div className={`relative overflow-hidden rounded-lg ${className}`}>
       {previewImages[0] ? (
         <Image
           src={`data:image/jpeg;base64,${previewImages[0]}`}
@@ -51,8 +51,8 @@ function ProjectCard({ data, className }: CardFace) {
         <div className="size-2 bg-accent-500 rounded-full animate-pulse" />
         <p>{status}</p>
       </div>
-      <div className="w-full absolute bottom-0 p-6 text-white">
-        <h2 className="text-2xl uppercase font-[500]">{title}</h2>
+      <div className="w-full absolute bottom-0 p-3 text-white">
+        <h2 className="text-xl uppercase font-[500]">{title}</h2>
         <div className="flex justify-between text-md font-[200] text-xs">
           <span>{address}</span>
           <span className="opacity-75">Year {setDate.getFullYear()}</span>

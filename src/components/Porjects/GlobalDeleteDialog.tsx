@@ -1,5 +1,4 @@
 "use client";
-
 import { useSearchParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import PrimaryBtn from "../buttons/PrimaryBtn";

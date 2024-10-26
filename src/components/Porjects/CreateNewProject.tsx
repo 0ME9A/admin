@@ -106,7 +106,7 @@ const CreateNewProject = ({
 
   return (
     <div className="p-6 text-black">
-      <h2 className="text-2xl mb-4 text-white">Upload Project</h2>
+      <h2 className="text-2xl mb-4 text-white">Create New Project</h2>
       <form onSubmit={handleSubmit} className="text-white">
         <div className="mb-4">
           <label htmlFor="title" className="block mb-2">

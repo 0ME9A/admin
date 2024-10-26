@@ -1,9 +1,9 @@
 "use client";
-
 import React, { useState } from "react";
+import { FcPlus } from "react-icons/fc";
 import CreateNewProject from "./CreateNewProject";
 
-function Create() {
+function CreateNewProjectContainer() {
   const [projectForm, setProjectForm] = useState(false);
 
   return (
@@ -18,9 +18,9 @@ function Create() {
         <>
           <label
             htmlFor="newData"
-            className="w-full h-full block p-10 py-24 rounded-xl cursor-pointer"
+            className="w-full h-full p-10 py-24 rounded-xl cursor-pointer text-xl flex items-center gap-2"
           >
-            Create New Data +
+            Create New Data <FcPlus className="text-2xl"/>
           </label>
           <button
             id="newData"
@@ -35,4 +35,4 @@ function Create() {
   );
 }
 
-export default Create;
+export default CreateNewProjectContainer;

@@ -1,12 +1,11 @@
 import { ProjectFace } from "@/ts/components";
 import { Suspense } from "react";
+import CreateNewProjectContainer from "@/components/Porjects/CreateNewProjectContainer";
 import GlobalDeleteDialog from "@/components/Porjects/GlobalDeleteDialog";
+import GlobalEditDialog from "@/components/Porjects/GlobalEditDialog";
 import ProjectCard from "@/components/cards/ProjectCard";
 import FailedToFetch from "@/components/failed-to-fetch";
 import Loading from "@/components/loading";
-import GlobalEditDialog from "@/components/Porjects/GlobalEditDialog";
-import Create from "@/components/Porjects/Create";
-// import GlobalCreateDialog from "@/components/Porjects/GlobalCreateDialog";
 
 async function page() {
   let projects: ProjectFace[] = [];
@@ -37,12 +36,11 @@ async function page() {
 
   return (
     <>
-      {/* <GlobalCreateDialog /> */}
       <GlobalEditDialog />
       <GlobalDeleteDialog />
       <div className={"w-full h-full text-white space-y-4"}>
-        <Create />
-        <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+        <CreateNewProjectContainer />
+        <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 sm:p-4 bg-navy-800 rounded-xl">
           <Suspense fallback={<Loading />}>
             {projects.map((item) => (
               <ProjectCard key={item._id} data={item} />

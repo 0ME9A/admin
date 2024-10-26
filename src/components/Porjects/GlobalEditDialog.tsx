@@ -1,5 +1,4 @@
 "use client";
-
 import { useRouter, useSearchParams } from "next/navigation";
 import { ProjectFace } from "@/ts/components";
 import { useEffect, useState } from "react";
@@ -20,6 +19,7 @@ const emptyData = {
 
 const GlobalEditDialog = () => {
   const [project, setProject] = useState<Omit<ProjectFace, "_id">>(emptyData);
+  const [projectFetchLoading, setProjectFetchLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -111,11 +111,14 @@ const GlobalEditDialog = () => {
   // Fetch project data from the server
   const fetchProject = async (id: string) => {
     try {
+      setProjectFetchLoading(true);
       const response = await fetch(`/api/admin/projects/${id}`);
       if (response.ok) {
         const data = await response.json();
         setProject(data);
+        setProjectFetchLoading(false);
       } else {
+        setProjectFetchLoading(false);
         console.error("Failed to fetch project");
       }
     } catch (error) {
@@ -134,7 +137,14 @@ const GlobalEditDialog = () => {
   return (
     <section className="fixed top-0 left-0 w-full bg-black/50 z-50 overflow-auto py-10 h-dvh backdrop-blur-sm">
       <div className="p-6 text-black max-w-xl w-full mx-auto bg-navy-800 rounded-lg">
-        <h2 className="text-2xl mb-4 text-white">Upload Project</h2>
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl mb-4 text-white">Upload Project</h2>
+          {projectFetchLoading ? (
+            <div className="size-5 border-2 rounded-full border-t-transparent border-white animate-spin"></div>
+          ) : (
+            ""
+          )}
+        </div>
         <form onSubmit={handleSubmit} className="text-white">
           <div className="mb-4">
             <label htmlFor="title" className="block mb-2">
@@ -278,7 +288,11 @@ const GlobalEditDialog = () => {
             >
               Close
             </PrimaryBtn>
-            <PrimaryBtn type="submit" disabled={loading} className="disabled:bg-accent-400">
+            <PrimaryBtn
+              type="submit"
+              disabled={loading}
+              className="disabled:bg-accent-400"
+            >
               {loading ? "Uploading..." : "Upload Project"}
             </PrimaryBtn>
           </div>
