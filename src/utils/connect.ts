@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
+import mongoose, { Connection } from "mongoose";
 
 declare global {
   var mongoose: {
-    conn: any;
-    promise: any;
+    conn: Connection | null;
+    promise: Promise<Connection> | null;
   };
 }
 

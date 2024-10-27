@@ -123,7 +123,7 @@ const GlobalEditDialog = () => {
     if (testimonialId && action === "edit") {
       fetchTestimonial(testimonialId);
     }
-  }, [searchParams]);
+  }, [testimonialId, action]);
 
   if (!testimonialId || action !== "edit") return null;
 
