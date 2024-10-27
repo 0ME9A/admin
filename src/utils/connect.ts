@@ -1,14 +1,5 @@
 import mongoose, { Connection } from "mongoose";
 
-declare global {
-  var mongoose: {
-    conn: Connection | null;
-    promise: Promise<Connection> | null;
-  };
-}
-
-export {};
-
 const DB_NAME = process.env.DB_NAME || "";
 const DB_PASS = process.env.DB_PASS || "";
 const DB_URI = `mongodb+srv://omega:${DB_PASS}@cluster0.nzhvgym.mongodb.net/${DB_NAME}?retryWrites=true&w=majority&appName=Cluster0`;
@@ -19,11 +10,11 @@ if (!DB_URI) {
   );
 }
 
-let cached = global.mongoose;
-
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
-}
+// Local cached connection
+let cached: { conn: Connection | null; promise: Promise<Connection> | null } = {
+  conn: null,
+  promise: null,
+};
 
 async function connectMongo() {
   if (cached.conn) {
