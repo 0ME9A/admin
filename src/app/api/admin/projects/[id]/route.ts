@@ -3,11 +3,14 @@ import connectMongo from "@/utils/connect";
 import Project from "@/models/project";
 
 // GET method to retrieve a single project by ID
-export async function GET(req: Request, context: { params: { id: string } }) {
+export async function GET(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    await connectMongo(); // Ensure the database is connected
+    const projectId = (await params).id;
 
-    const projectId = context.params.id;
+    await connectMongo(); // Ensure the database is connected
 
     // Fetch the project by ID
     const project = await Project.findById(projectId);
@@ -31,15 +34,15 @@ export async function GET(req: Request, context: { params: { id: string } }) {
 
 export async function DELETE(
   req: Request,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const projectId = (await params).id;
+
     await connectMongo(); // Connect to the database
 
-    const id = context.params.id;
-
     // Find and delete the project by its ID
-    const deletedProject = await Project.findByIdAndDelete(id);
+    const deletedProject = await Project.findByIdAndDelete(projectId);
 
     if (!deletedProject) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
@@ -59,13 +62,15 @@ export async function DELETE(
 }
 
 // PUT method to update a project by ID
-export async function PUT(req: Request, context: { params: { id: string } }) {
+export async function PUT(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    // Get the project ID from the URL parameters
+    const projectId = (await params).id;
     // Connect to MongoDB
     await connectMongo();
-
-    // Get the project ID from the URL parameters
-    const id = context.params.id;
 
     // Parse the JSON body from the request
     const { title, address, desc, date, projectType, status, previewImages } =
@@ -91,9 +96,13 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
     };
 
     // Update the project in MongoDB and return the updated document
-    const updatedProject = await Project.findByIdAndUpdate(id, updatedData, {
-      new: true, // Return the updated document
-    });
+    const updatedProject = await Project.findByIdAndUpdate(
+      projectId,
+      updatedData,
+      {
+        new: true, // Return the updated document
+      }
+    );
 
     // If the project is not found, return a 404 response
     if (!updatedProject) {

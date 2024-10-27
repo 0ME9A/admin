@@ -1,10 +1,17 @@
-import mongoose from "mongoose";
+import mongoose, { Connection } from "mongoose";
 
+declare global {
+  var mongoose: {
+    conn: Connection | null;
+    promise: Promise<Connection> | null;
+  };
+}
 
-const DB_NAME = process.env.DB_NAME || ""; // Fetch MongoDB URI from the environment variables
-const DB_PASS = process.env.DB_PASS || ""; // Fetch MongoDB URI from the environment variables
-const DB_URI = `mongodb+srv://omega:${DB_PASS}@cluster0.nzhvgym.mongodb.net/${DB_NAME}?retryWrites=true&w=majority&appName=Cluster0`; // Add your MongoDB URI here
+export {};
 
+const DB_NAME = process.env.DB_NAME || "";
+const DB_PASS = process.env.DB_PASS || "";
+const DB_URI = `mongodb+srv://omega:${DB_PASS}@cluster0.nzhvgym.mongodb.net/${DB_NAME}?retryWrites=true&w=majority&appName=Cluster0`;
 
 if (!DB_URI) {
   throw new Error(
@@ -12,7 +19,6 @@ if (!DB_URI) {
   );
 }
 
-// Create a cached connection object in the global scope
 let cached = global.mongoose;
 
 if (!cached) {
@@ -31,7 +37,11 @@ async function connectMongo() {
 
     cached.promise = mongoose
       .connect(DB_URI, opts)
-      .then((mongoose) => mongoose.connection);
+      .then((mongoose) => mongoose.connection)
+      .catch((err) => {
+        console.error("MongoDB connection error:", err);
+        throw err;
+      });
   }
 
   cached.conn = await cached.promise;
