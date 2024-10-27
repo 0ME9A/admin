@@ -3,14 +3,11 @@ import Testimonial, { TestimonialFace } from "@/models/testimonial";
 import connectMongo from "@/utils/connect";
 
 // GET method to retrieve a single testimonial by ID
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: Request, context: { params: { id: string } }) {
   try {
     await connectMongo(); // Ensure the database is connected
 
-    const testimonialId = params.id;
+    const testimonialId = context.params.id;
 
     // Fetch the testimonial by ID
     const testimonial = await Testimonial.findById(testimonialId);
@@ -34,12 +31,12 @@ export async function GET(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     await connectMongo(); // Connect to the database
 
-    const { id } = params;
+    const id = context.params.id;
 
     // Find and delete the testimonial by its ID
     const deletedTestimonial = await Testimonial.findByIdAndDelete(id);
@@ -64,76 +61,13 @@ export async function DELETE(
   }
 }
 
-// // app/api/admin/testimonial/[id]/route.ts
-// export async function PUT(
-//   req: Request,
-//   { params }: { params: { id: string } }
-// ) {
-//   try {
-//     // Connect to MongoDB
-//     await connectMongo();
-
-//     // Get the project ID from the URL parameters
-//     const { id } = params;
-
-//     // Parse the JSON body from the request
-//     const { name, profession, message, rate, profile } = await req.json();
-
-//     // Validate that all required fields are provided
-//     if (!name || !profession || !message || !rate || !profile) {
-//       return NextResponse.json(
-//         { error: "All required fields must be provided" },
-//         { status: 400 }
-//       );
-//     }
-
-//     // Prepare the updated data
-//     const updatedData = { name, profession, message, rate, profile };
-
-//     // Update the testimonial in MongoDB and return the updated document
-//     const updatedTestimonial = await Testimonial.findByIdAndUpdate(
-//       id,
-//       updatedData,
-//       {
-//         new: true, // Return the updated document
-//       }
-//     );
-
-//     // If the testimonial is not found, return a 404 response
-//     if (!updatedTestimonial) {
-//       return NextResponse.json(
-//         { error: "Testimonial not found" },
-//         { status: 404 }
-//       );
-//     }
-
-//     // Return the updated testimonial in the response
-//     return NextResponse.json(
-//       {
-//         message: "Testimonial updated successfully",
-//         project: updatedTestimonial,
-//       },
-//       { status: 200 }
-//     );
-//   } catch (error) {
-//     console.error("Error updating testimonial:", error);
-//     return NextResponse.json(
-//       { error: "Failed to update testimonial" },
-//       { status: 500 }
-//     );
-//   }
-// }
-
-// app/api/admin/testimonial/[id]/route.ts
-export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+// PUT method to update a testimonial by ID
+export async function PUT(req: Request, context: { params: { id: string } }) {
   try {
     // Connect to MongoDB
     await connectMongo();
 
-    const { id } = params;
+    const id = context.params.id;
     const { name, profession, message, rate, profile } = await req.json();
 
     // Validate required fields

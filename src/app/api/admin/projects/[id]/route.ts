@@ -3,14 +3,11 @@ import connectMongo from "@/utils/connect";
 import Project from "@/models/project";
 
 // GET method to retrieve a single project by ID
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: Request, context: { params: { id: string } }) {
   try {
     await connectMongo(); // Ensure the database is connected
 
-    const projectId = params.id;
+    const projectId = context.params.id;
 
     // Fetch the project by ID
     const project = await Project.findById(projectId);
@@ -34,12 +31,12 @@ export async function GET(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     await connectMongo(); // Connect to the database
 
-    const { id } = params;
+    const id = context.params.id;
 
     // Find and delete the project by its ID
     const deletedProject = await Project.findByIdAndDelete(id);
@@ -61,17 +58,14 @@ export async function DELETE(
   }
 }
 
-// app/api/admin/projects/[id]/route.ts
-export async function PUT(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+// PUT method to update a project by ID
+export async function PUT(req: Request, context: { params: { id: string } }) {
   try {
     // Connect to MongoDB
     await connectMongo();
 
     // Get the project ID from the URL parameters
-    const { id } = params;
+    const id = context.params.id;
 
     // Parse the JSON body from the request
     const { title, address, desc, date, projectType, status, previewImages } =
