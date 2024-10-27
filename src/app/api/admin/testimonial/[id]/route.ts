@@ -3,11 +3,14 @@ import Testimonial, { TestimonialFace } from "@/models/testimonial";
 import connectMongo from "@/utils/connect";
 
 // GET method to retrieve a single testimonial by ID
-export async function GET(req: Request, context: { params: { id: string } }) {
+export async function GET(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     await connectMongo(); // Ensure the database is connected
 
-    const testimonialId = context.params.id;
+    const testimonialId = (await params).id;
 
     // Fetch the testimonial by ID
     const testimonial = await Testimonial.findById(testimonialId);
@@ -31,15 +34,15 @@ export async function GET(req: Request, context: { params: { id: string } }) {
 
 export async function DELETE(
   req: Request,
-  context: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectMongo(); // Connect to the database
 
-    const id = context.params.id;
+    const projectId = (await params).id;
 
     // Find and delete the testimonial by its ID
-    const deletedTestimonial = await Testimonial.findByIdAndDelete(id);
+    const deletedTestimonial = await Testimonial.findByIdAndDelete(projectId);
 
     if (!deletedTestimonial) {
       return NextResponse.json(
@@ -62,12 +65,16 @@ export async function DELETE(
 }
 
 // PUT method to update a testimonial by ID
-export async function PUT(req: Request, context: { params: { id: string } }) {
+export async function PUT(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     // Connect to MongoDB
     await connectMongo();
 
-    const id = context.params.id;
+    const testimonialId = (await params).id;
+
     const { name, profession, message, rate, profile } = await req.json();
 
     // Validate required fields
@@ -88,7 +95,7 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
 
     // Update and return the updated document
     const updatedTestimonial = await Testimonial.findByIdAndUpdate(
-      id,
+      testimonialId,
       updatedData,
       { new: true }
     );
