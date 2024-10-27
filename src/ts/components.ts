@@ -29,6 +29,7 @@ export interface TestimonialFace {
   rate: number; // Represents rating as a number (4.8 in the example)
   date: string; // ISO date string
   profile: string; // URL to the profile image
+  email: string;
 }
 
 export interface CountryPhoneCode {

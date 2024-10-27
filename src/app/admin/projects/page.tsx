@@ -1,8 +1,8 @@
 import { ProjectFace } from "@/ts/components";
 import { Suspense } from "react";
-import CreateNewProjectContainer from "@/components/Porjects/CreateNewProjectContainer";
-import GlobalDeleteDialog from "@/components/Porjects/GlobalDeleteDialog";
-import GlobalEditDialog from "@/components/Porjects/GlobalEditDialog";
+import CreateNewProjectContainer from "@/components/Projects/CreateNewProjectContainer";
+import GlobalDeleteDialog from "@/components/Projects/GlobalDeleteDialog";
+import GlobalEditDialog from "@/components/Projects/GlobalEditDialog";
 import ProjectCard from "@/components/cards/ProjectCard";
 import FailedToFetch from "@/components/failed-to-fetch";
 import Loading from "@/components/loading";
