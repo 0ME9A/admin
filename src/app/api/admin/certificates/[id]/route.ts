@@ -70,10 +70,11 @@ export async function DELETE(
 // PUT method: Update a certificate by ID
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    // Get the certificate ID from the URL parameters
+    const id = (await params).id;
 
     await connectMongo(); // Ensure database connection
 
