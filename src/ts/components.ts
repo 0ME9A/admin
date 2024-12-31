@@ -37,3 +37,15 @@ export interface CountryPhoneCode {
   dial_code: string;
   code: string;
 }
+
+export interface CertificateFace {
+  _id: string;
+  title: string;
+  desc: string;
+  name: string;
+  certSrc: string;
+  certId: string;
+  createdAt?: string;
+  updatedAt?: string;
+  issueDate: string;
+}
