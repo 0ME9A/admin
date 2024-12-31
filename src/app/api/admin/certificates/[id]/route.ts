@@ -5,15 +5,16 @@ import connectMongo from "@/utils/connect";
 // GET method: Retrieve a single certificate by ID
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: certId } = params;
+    // Get the certificate ID from the URL parameters
+    const id = (await params).id;
 
     await connectMongo(); // Ensure database connection
 
     // Fetch the certificate by ID
-    const certificate = await Certificate.findById(certId);
+    const certificate = await Certificate.findById(id);
 
     if (!certificate) {
       return NextResponse.json(
@@ -35,17 +36,16 @@ export async function GET(
 // DELETE method: Delete a certificate by ID
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: certificateId } = params;
+    // Get the certificate ID from the URL parameters
+    const id = (await params).id;
 
     await connectMongo(); // Ensure database connection
 
     // Find and delete the certificate
-    const deletedCertificate = await Certificate.findByIdAndDelete(
-      certificateId
-    );
+    const deletedCertificate = await Certificate.findByIdAndDelete(id);
 
     if (!deletedCertificate) {
       return NextResponse.json(
