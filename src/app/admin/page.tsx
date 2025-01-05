@@ -1,11 +1,8 @@
-import React from "react";
-
-function page() {
+export default function AdminPage() {
   return (
-    <div className="bg-red-400 w-full">
-      <p>This is home page</p>
+    <div>
+      <h1>Admin Panel</h1>
+      {/* You can add content for creating, editing, and deleting here */}
     </div>
   );
 }
-
-export default page;
