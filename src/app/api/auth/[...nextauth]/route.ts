@@ -1,10 +1,11 @@
+import { NextResponse } from "next/server";
 import { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import connectMongo from "@/utils/connect";
 import NextAuth from "next-auth/next";
 import Admin from "@/models/admin";
 
-const authOptions: AuthOptions = {
+export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -38,8 +39,9 @@ const authOptions: AuthOptions = {
 
 const handler = NextAuth(authOptions);
 
-// Default export for the API route
-export default handler;
-
 // Additional exports for GET and POST methods
 export { handler as GET, handler as POST };
+
+export default async function PUT() {
+  return NextResponse.json({ status: "Nothing to put!" });
+}
