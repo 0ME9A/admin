@@ -2,9 +2,10 @@
 import { useSelectedLayoutSegment } from "next/navigation";
 import { IoCloseSharp } from "react-icons/io5";
 import { HiMenuAlt3 } from "react-icons/hi";
+import { signOut } from "next-auth/react";
 import { siteMap } from "@/data/sitemap";
-import React, { useState } from "react";
-
+import { useState } from "react";
+import PrimaryBtn from "./buttons/PrimaryBtn";
 import Link from "next/link";
 
 function Sidebar() {
@@ -27,7 +28,7 @@ function Sidebar() {
         }`}
       >
         <div className="py-2 flex justify-between items-center">
-          <h1 className="font-bold text-lg text-white">Admin</h1>
+          <h1 className="font-bold text-lg text-white">Admin / 24x7 </h1>
         </div>
         <ul>
           {siteMap.map((item) => (
@@ -50,11 +51,13 @@ function Sidebar() {
                       : ""
                   }`}
                 ></span>
-                {/* <span className={"p-2 bg-red-500"}></span> */}
               </Link>
             </li>
           ))}
         </ul>
+        <PrimaryBtn className="w-full" onClick={() => signOut()}>
+          Sign out
+        </PrimaryBtn>
       </div>
     </>
   );
