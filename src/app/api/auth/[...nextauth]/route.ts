@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import connectMongo from "@/utils/connect";
@@ -41,7 +40,3 @@ const handler = NextAuth(authOptions);
 
 // Additional exports for GET and POST methods
 export { handler as GET, handler as POST };
-
-export default async function PUT() {
-  return NextResponse.json({ status: "Nothing to put!" });
-}
