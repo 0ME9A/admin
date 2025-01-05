@@ -4,7 +4,7 @@ import connectMongo from "@/utils/connect";
 import NextAuth from "next-auth/next";
 import Admin from "@/models/admin";
 
-export const authOptions: AuthOptions = {
+const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -37,6 +37,6 @@ export const authOptions: AuthOptions = {
 };
 
 const handler = NextAuth(authOptions);
-export default handler;
+export default authOptions;
 
 export { handler as GET, handler as POST };
