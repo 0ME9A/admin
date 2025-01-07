@@ -16,7 +16,7 @@ export interface ProjectFace {
   address: string;
   desc: string;
   date: string;
-  projectType: string;
+  projectType: string[];
   status: "completed" | "ongoing" | string;
   previewImages: string[];
 }
@@ -49,3 +49,10 @@ export interface CertificateFace {
   updatedAt?: string;
   issueDate: string;
 }
+
+export interface PaginationFace {
+   totalProjects: number;
+   totalPages: number;
+   currentPage: number;
+   limit: number;
+ }

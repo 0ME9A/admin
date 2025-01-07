@@ -1,18 +1,31 @@
-import { ProjectFace } from "@/ts/components";
+import { PaginationFace, ProjectFace } from "@/ts/components";
 import { Suspense } from "react";
 import CreateNewProjectContainer from "@/components/Projects/CreateNewProjectContainer";
 import GlobalDeleteDialog from "@/components/Projects/GlobalDeleteDialog";
 import GlobalEditDialog from "@/components/Projects/GlobalEditDialog";
 import ProjectCard from "@/components/cards/ProjectCard";
 import FailedToFetch from "@/components/failed-to-fetch";
+import Pagination from "@/components/Pagination";
 import Loading from "@/components/loading";
 
-async function page() {
-  let projects: ProjectFace[] = [];
+type Params = Promise<{ slug: string }>;
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
+async function Page(props: { params: Params; searchParams: SearchParams }) {
+  let projects: ProjectFace[] = [];
+  const searchParams = await props.searchParams;
+
+  let pagination: PaginationFace = {
+    totalProjects: 0,
+    totalPages: 0,
+    currentPage: 0,
+    limit: 0,
+  };
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/projects`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/projects?page=${
+        searchParams?.page || 1
+      }`,
       { cache: "no-store" }
     );
 
@@ -20,6 +33,7 @@ async function page() {
 
     const apiResponse = await res.json();
     projects = apiResponse.data;
+    pagination = apiResponse.pagination;
   } catch (error) {
     console.error("Error fetching projects:", error);
     return (
@@ -47,9 +61,13 @@ async function page() {
             ))}
           </Suspense>
         </section>
+        <Pagination
+          totalPages={pagination.totalPages}
+          currentPage={pagination.currentPage}
+        />
       </div>
     </>
   );
 }
 
-export default page;
+export default Page;

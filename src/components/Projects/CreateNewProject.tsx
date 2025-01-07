@@ -12,7 +12,7 @@ const emptyData = {
   address: "",
   desc: "",
   date: new Date().toISOString(),
-  projectType: "",
+  projectType: [],
   status: "",
   previewImages: [],
 };
@@ -24,6 +24,12 @@ const CreateNewProject = ({
 }) => {
   const [project, setProject] = useState<Omit<ProjectFace, "_id">>(emptyData);
   const [loading, setLoading] = useState(false);
+
+  const handleProjectTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value;
+    const types = input.split(",").map((item) => item.trim()); // Split and clean input
+    setProject({ ...project, projectType: types });
+  };
 
   // Compress and convert the image to Base64
   const handleImageUpload = async (file: File) => {
@@ -105,160 +111,176 @@ const CreateNewProject = ({
   };
 
   return (
-    <div className="p-6 text-black">
-      <h2 className="text-2xl mb-4 text-white">Create New Project</h2>
-      <form onSubmit={handleSubmit} className="text-white">
-        <div className="mb-4">
-          <label htmlFor="title" className="block mb-2">
-            Title
-          </label>
-          <input
-            type="text"
-            id="title"
-            value={project.title}
-            onChange={(e) => setProject({ ...project, title: e.target.value })}
-            className="w-full p-2 border text-black"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label htmlFor="desc" className="block mb-2">
-            Description
-          </label>
-          <textarea
-            id="desc"
-            value={project.desc}
-            onChange={(e) => setProject({ ...project, desc: e.target.value })}
-            className="w-full p-2 border text-black"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label htmlFor="address" className="block mb-2">
-            Address
-          </label>
-          <input
-            type="text"
-            id="address"
-            value={project.address}
-            onChange={(e) =>
-              setProject({ ...project, address: e.target.value })
-            }
-            className="w-full p-2 border text-black"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label htmlFor="status" className="block mb-2">
-            Status
-          </label>
-          <select
-            id="status"
-            value={project.status}
-            onChange={(e) => setProject({ ...project, status: e.target.value })}
-            className="w-full p-2 border text-black"
-            required
-          >
-            <option value="" disabled>
-              Select Status
-            </option>
-            <option value="completed">Completed</option>
-            <option value="ongoing">Ongoing</option>
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <label htmlFor="date" className="block mb-2">
-            Date
-          </label>
-          <input
-            type="date"
-            id="date"
-            value={new Date(project.date).toISOString().split("T")[0]}
-            onChange={(e) => setProject({ ...project, date: e.target.value })}
-            className="w-full p-2 border text-black"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label htmlFor="projectType" className="block mb-2">
-            Project Type
-          </label>
-          <input
-            type="text"
-            id="projectType"
-            value={project.projectType}
-            onChange={(e) =>
-              setProject({ ...project, projectType: e.target.value })
-            }
-            className="w-full p-2 border text-black"
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <div>
-            <label className="mb-2 flex justify-between gap-4">
-              Upload Preview Images{" "}
-              <strong className="">({project.previewImages.length})</strong>
+    <section className="fixed top-0 left-0 w-full bg-black/50 z-50 overflow-auto py-10 h-dvh backdrop-blur-sm">
+      <div className="p-6 text-black max-w-xl w-full mx-auto bg-navy-800 rounded-lg">
+        <h2 className="text-2xl mb-4 text-white">Create New Project</h2>
+        <form onSubmit={handleSubmit} className="text-white">
+          <div className="mb-4">
+            <label htmlFor="title" className="block mb-2">
+              Title
             </label>
             <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="w-full p-2"
+              type="text"
+              id="title"
+              value={project.title}
+              onChange={(e) =>
+                setProject({ ...project, title: e.target.value })
+              }
+              className="w-full p-2 border text-black"
+              required
             />
           </div>
-          <div className="mt-2 grid grid-cols-3 gap-4">
-            {project.previewImages.length > 0 &&
-              project.previewImages.map((img, index) => (
-                <div className="w-full aspect-video relative" key={index}>
-                  <Image
-                    width={500}
-                    height={500}
-                    src={`data:image/jpeg;base64,${img}`}
-                    alt={`Preview ${index + 1}`}
-                    className="object-cover rounded w-full"
-                  />
 
-                  <button
-                    type="button"
-                    className="absolute top-2 right-2 p-1 rounded-full bg-red-500 hover:bg-red-600"
-                    id="remove-image"
-                    onClick={() => removeImage(index)} // Remove image on button click
-                  >
-                    <IoMdClose />
-                  </button>
-                </div>
-              ))}
+          <div className="mb-4">
+            <label htmlFor="desc" className="block mb-2">
+              Description
+            </label>
+            <textarea
+              id="desc"
+              value={project.desc}
+              onChange={(e) => setProject({ ...project, desc: e.target.value })}
+              className="w-full p-2 border text-black"
+              required
+            />
           </div>
-        </div>
 
-        <div className="flex justify-end gap-2 mt-5">
-          <PrimaryBtn
-            type="button"
-            className="bg-gray-500 hover:bg-gray-600"
-            onClick={() => setProjectForm(false)}
-          >
-            Close
-          </PrimaryBtn>
-          <PrimaryBtn
-            type="button"
-            className="bg-gray-500 hover:bg-gray-600"
-            onClick={() => setProject(emptyData)}
-          >
-            Reset
-          </PrimaryBtn>
-          <PrimaryBtn type="submit" disabled={loading}>
-            {loading ? "Uploading..." : "Upload Project"}
-          </PrimaryBtn>
-        </div>
-      </form>
-    </div>
+          <div className="mb-4">
+            <label htmlFor="address" className="block mb-2">
+              Address
+            </label>
+            <input
+              type="text"
+              id="address"
+              value={project.address}
+              onChange={(e) =>
+                setProject({ ...project, address: e.target.value })
+              }
+              className="w-full p-2 border text-black"
+              required
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="status" className="block mb-2">
+              Status
+            </label>
+            <select
+              id="status"
+              value={project.status}
+              onChange={(e) =>
+                setProject({ ...project, status: e.target.value })
+              }
+              className="w-full p-2 border text-black"
+              required
+            >
+              <option value="" disabled>
+                Select Status
+              </option>
+              <option value="completed">Completed</option>
+              <option value="ongoing">Ongoing</option>
+            </select>
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="date" className="block mb-2">
+              Date
+            </label>
+            <input
+              type="date"
+              id="date"
+              value={new Date(project.date).toISOString().split("T")[0]}
+              onChange={(e) => setProject({ ...project, date: e.target.value })}
+              className="w-full p-2 border text-black"
+              required
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="projectType" className="block mb-2">
+              Project Type{" "}
+              <span className="text-accent-500">
+                (Add multiple types, separated by commas `,`).
+              </span>
+            </label>
+            <input
+              type="text"
+              id="projectType"
+              value={project.projectType.join(", ")} // Join the array for display
+              onChange={handleProjectTypeChange} // Update projectType correctly
+              className="w-full p-2 border text-black"
+              required
+            />
+            <div className="flex flex-wrap gap-2 py-2">
+              {project.projectType.map((item, index) => (
+                <span
+                  key={`${item}-${index}`} // Ensure unique keys
+                  className="px-2 py-1 bg-gray-200 dark:bg-navy-500 rounded-md font-thin"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="mb-4">
+            <div>
+              <label className="mb-2 flex justify-between gap-4">
+                Upload Preview Images{" "}
+                <strong className="">({project.previewImages.length})</strong>
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="w-full p-2"
+              />
+            </div>
+            <div className="mt-2 grid grid-cols-3 gap-4">
+              {project.previewImages.length > 0 &&
+                project.previewImages.map((img, index) => (
+                  <div className="w-full aspect-video relative" key={index}>
+                    <Image
+                      width={500}
+                      height={500}
+                      src={`data:image/jpeg;base64,${img}`}
+                      alt={`Preview ${index + 1}`}
+                      className="object-cover rounded w-full"
+                    />
+
+                    <button
+                      type="button"
+                      className="absolute top-2 right-2 p-1 rounded-full bg-red-500 hover:bg-red-600"
+                      id="remove-image"
+                      onClick={() => removeImage(index)} // Remove image on button click
+                    >
+                      <IoMdClose />
+                    </button>
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 mt-5">
+            <PrimaryBtn
+              type="button"
+              className="bg-gray-500 hover:bg-gray-600"
+              onClick={() => setProjectForm(false)}
+            >
+              Close
+            </PrimaryBtn>
+            <PrimaryBtn
+              type="button"
+              className="bg-gray-500 hover:bg-gray-600"
+              onClick={() => setProject(emptyData)}
+            >
+              Reset
+            </PrimaryBtn>
+            <PrimaryBtn type="submit" disabled={loading}>
+              {loading ? "Uploading..." : "Upload Project"}
+            </PrimaryBtn>
+          </div>
+        </form>
+      </div>
+    </section>
   );
 };
 
