@@ -12,7 +12,7 @@ const emptyData = {
   address: "",
   desc: "",
   date: new Date().toISOString(),
-  projectType: "",
+  projectType: [],
   status: "",
   previewImages: [],
 };
@@ -23,6 +23,12 @@ const GlobalEditDialog = () => {
   const [loading, setLoading] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  const handleProjectTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value;
+    const types = input.split(",").map((item) => item.trim()); // Split and clean input
+    setProject({ ...project, projectType: types });
+  };
 
   const projectId = searchParams.get("id");
   const action = searchParams.get("action");
@@ -228,18 +234,29 @@ const GlobalEditDialog = () => {
 
           <div className="mb-4">
             <label htmlFor="projectType" className="block mb-2">
-              Project Type
+              Project Type{" "}
+              <span className="text-accent-500">
+                (Add multiple types, separated by commas `,`).
+              </span>
             </label>
             <input
               type="text"
               id="projectType"
-              value={project.projectType}
-              onChange={(e) =>
-                setProject({ ...project, projectType: e.target.value })
-              }
+              value={project.projectType.join(", ")} // Join the array for display
+              onChange={handleProjectTypeChange} // Update projectType correctly
               className="w-full p-2 border text-black"
               required
             />
+            <div className="flex flex-wrap gap-2 py-2">
+              {project.projectType.map((item, index) => (
+                <span
+                  key={`${item}-${index}`} // Ensure unique keys
+                  className="px-2 py-1 bg-gray-200 dark:bg-navy-500 rounded-md font-thin"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
           </div>
 
           <div className="mb-4">

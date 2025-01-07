@@ -6,7 +6,7 @@ export interface ProjectFace extends Document {
   address: string;
   desc: string;
   date: string;
-  projectType: string;
+  projectType: string[];
   status: "completed" | "ongoing" | string;
   previewImages: string[]; // Array to store Base64 image strings
 }
@@ -16,7 +16,7 @@ const ProjectSchema = new Schema<ProjectFace>({
   address: { type: String, required: true },
   desc: { type: String, required: true },
   date: { type: String, required: true },
-  projectType: { type: String, required: true },
+  projectType: { type: [String], required: true },
   status: { type: String, required: true },
   previewImages: { type: [String], default: [] },
 });

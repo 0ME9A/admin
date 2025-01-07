@@ -7,6 +7,7 @@ import Project from "@/models/project";
 export async function POST(request: Request) {
   try {
     const data: ProjectFace = await request.json();
+    // console.log("🚀 ~ POST ~ data:", data)
 
     // Connect to MongoDB
     await connectMongo(); // Connect to the database
