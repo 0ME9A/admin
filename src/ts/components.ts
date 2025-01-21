@@ -21,6 +21,13 @@ export interface ProjectFace {
   previewImages: string[];
 }
 
+export interface GalleryFace {
+  _id: string;
+  title: string;
+  desc: string;
+  previewImages: string[];
+}
+
 export interface TestimonialFace {
   _id: string; // MongoDB ObjectId as a string
   name: string;

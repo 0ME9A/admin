@@ -17,6 +17,11 @@ export const siteMap: sitemapFace[] = [
     url: "/projects",
   },
   {
+    id: "gallery",
+    name: "gallery",
+    url: "/gallery",
+  },
+  {
     id: "testimonial",
     name: "testimonial",
     url: "/testimonial",
